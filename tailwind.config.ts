@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,7 +62,28 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				// Travel-themed colors
+				ocean: {
+					light: '#E0F7FA',
+					DEFAULT: '#0EA5E9',
+					dark: '#0369A1',
+				},
+				sunset: {
+					light: '#FFECB3',
+					DEFAULT: '#F97316',
+					dark: '#C2410C',
+				},
+				forest: {
+					light: '#E8F5E9',
+					DEFAULT: '#34D399',
+					dark: '#047857',
+				},
+				sand: {
+					light: '#FEF3C7',
+					DEFAULT: '#FCD34D',
+					dark: '#B45309',
+				},
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -84,12 +106,52 @@ export default {
 					to: {
 						height: '0'
 					}
-				}
+				},
+				'float': {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-10px)' },
+				},
+				'rotate-globe': {
+					'0%': { transform: 'rotate(0deg)' },
+					'100%': { transform: 'rotate(360deg)' },
+				},
+				'fade-in': {
+					'0%': { opacity: '0', transform: 'translateY(10px)' },
+					'100%': { opacity: '1', transform: 'translateY(0)' },
+				},
+				'fade-in-left': {
+					'0%': { opacity: '0', transform: 'translateX(-20px)' },
+					'100%': { opacity: '1', transform: 'translateX(0)' },
+				},
+				'fade-in-right': {
+					'0%': { opacity: '0', transform: 'translateX(20px)' },
+					'100%': { opacity: '1', transform: 'translateX(0)' },
+				},
+				'letter-float': {
+					'0%': { transform: 'translateY(20px)', opacity: '0' },
+					'100%': { transform: 'translateY(0)', opacity: '1' },
+				},
+				'pulse-soft': {
+					'0%, 100%': { opacity: '1' },
+					'50%': { opacity: '0.7' },
+				},
+				'scale-up': {
+					'0%': { transform: 'scale(0.95)', opacity: '0' },
+					'100%': { transform: 'scale(1)', opacity: '1' },
+				},
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
-			}
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'float': 'float 6s ease-in-out infinite',
+				'rotate-globe': 'rotate-globe 20s linear infinite',
+				'fade-in': 'fade-in 0.6s ease-out',
+				'fade-in-left': 'fade-in-left 0.5s ease-out',
+				'fade-in-right': 'fade-in-right 0.5s ease-out',
+				'letter-float': 'letter-float 0.5s ease-out forwards',
+				'pulse-soft': 'pulse-soft 3s ease-in-out infinite',
+				'scale-up': 'scale-up 0.3s ease-out',
+			},
 		}
 	},
 	plugins: [require("tailwindcss-animate")],
