@@ -1,11 +1,11 @@
 
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calendar as CalendarIcon, MapPin, Plus, List, Check } from 'lucide-react';
+import { Calendar as CalendarIcon, MapPin, Plus, List, Check, Hotel, Plane, CreditCard } from 'lucide-react';
 import { cities, getAttractionsByCity, Attraction } from '@/data/attractions';
 import {
   Card,
@@ -20,6 +20,15 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -28,16 +37,27 @@ interface SelectedAttraction extends Attraction {
   day: number;
 }
 
+interface LocationState {
+  selectedCity?: string;
+}
+
 const PlanTrip: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const locationState = location.state as LocationState;
+  
   const [startDate, setStartDate] = useState<Date | undefined>(new Date());
   const [endDate, setEndDate] = useState<Date | undefined>(
     new Date(new Date().setDate(new Date().getDate() + 7))
   );
-  const [selectedCity, setSelectedCity] = useState<string | null>(null);
+  const [selectedCity, setSelectedCity] = useState<string | null>(locationState?.selectedCity || null);
   const [attractions, setAttractions] = useState<Attraction[]>([]);
   const [selectedAttractions, setSelectedAttractions] = useState<SelectedAttraction[]>([]);
   const [tripName, setTripName] = useState<string>('My Trip');
+  const [citySearchQuery, setCitySearchQuery] = useState<string>('');
+  const [filteredCities, setFilteredCities] = useState(cities);
+  const [flightBookingDialogOpen, setFlightBookingDialogOpen] = useState(false);
+  const [hotelBookingDialogOpen, setHotelBookingDialogOpen] = useState(false);
   
   // Calculate trip duration in days
   const tripDuration = startDate && endDate 
@@ -46,6 +66,25 @@ const PlanTrip: React.FC = () => {
   
   // Days array for the trip
   const tripDays = Array.from({ length: tripDuration }, (_, i) => i + 1);
+
+  useEffect(() => {
+    if (selectedCity) {
+      const cityAttractions = getAttractionsByCity(selectedCity);
+      setAttractions(cityAttractions);
+    }
+  }, [selectedCity]);
+
+  useEffect(() => {
+    if (citySearchQuery) {
+      const filtered = cities.filter(city => 
+        city.name.toLowerCase().includes(citySearchQuery.toLowerCase()) ||
+        city.country.toLowerCase().includes(citySearchQuery.toLowerCase())
+      );
+      setFilteredCities(filtered);
+    } else {
+      setFilteredCities(cities);
+    }
+  }, [citySearchQuery]);
   
   const handleCitySelect = (cityName: string) => {
     setSelectedCity(cityName);
@@ -80,6 +119,18 @@ const PlanTrip: React.FC = () => {
     // For now, we'll just show a success message and navigate
     toast.success("Trip saved successfully!");
     navigate('/trips');
+  };
+
+  const handleBookFlight = (e: React.FormEvent) => {
+    e.preventDefault();
+    toast.success("Flight booked successfully!");
+    setFlightBookingDialogOpen(false);
+  };
+
+  const handleBookHotel = (e: React.FormEvent) => {
+    e.preventDefault();
+    toast.success("Hotel booked successfully!");
+    setHotelBookingDialogOpen(false);
   };
   
   return (
@@ -167,22 +218,31 @@ const PlanTrip: React.FC = () => {
                   
                   <div>
                     <label className="block text-sm font-medium mb-2">Destination</label>
-                    <div className="grid grid-cols-2 gap-2">
-                      {cities.map(city => (
-                        <Button 
-                          key={city.id}
-                          variant={selectedCity === city.name ? "default" : "outline"}
-                          className="justify-start h-auto py-2 px-3"
-                          onClick={() => handleCitySelect(city.name)}
-                        >
-                          <MapPin className="h-4 w-4 mr-2" />
-                          {city.name}
-                        </Button>
-                      ))}
+                    <div className="space-y-2">
+                      <Input 
+                        type="text"
+                        placeholder="Search for cities..."
+                        value={citySearchQuery}
+                        onChange={(e) => setCitySearchQuery(e.target.value)}
+                        className="mb-2"
+                      />
+                      <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto">
+                        {filteredCities.map(city => (
+                          <Button 
+                            key={city.id}
+                            variant={selectedCity === city.name ? "default" : "outline"}
+                            className="justify-start h-auto py-2 px-3"
+                            onClick={() => handleCitySelect(city.name)}
+                          >
+                            <MapPin className="h-4 w-4 mr-2" />
+                            {city.name}
+                          </Button>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </CardContent>
-                <CardFooter>
+                <CardFooter className="flex flex-col space-y-2">
                   <Button 
                     className="w-full" 
                     onClick={handleFinishPlanning}
@@ -216,6 +276,141 @@ const PlanTrip: React.FC = () => {
                       <strong>Attractions:</strong> {selectedAttractions.length} planned
                     </p>
                   </CardContent>
+                  <CardFooter className="flex flex-col space-y-2">
+                    {/* Flight Booking */}
+                    <Dialog open={flightBookingDialogOpen} onOpenChange={setFlightBookingDialogOpen}>
+                      <DialogTrigger asChild>
+                        <Button className="w-full" variant="outline">
+                          <Plane className="h-4 w-4 mr-2" />
+                          Book Flight
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-md">
+                        <DialogHeader>
+                          <DialogTitle>Book Your Flight</DialogTitle>
+                          <DialogDescription>
+                            Find and book flights to {selectedCity}
+                          </DialogDescription>
+                        </DialogHeader>
+                        <form onSubmit={handleBookFlight} className="space-y-4 mt-4">
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">From</label>
+                            <Input placeholder="Departure airport" required />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">To</label>
+                            <Input value={selectedCity} readOnly />
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium">Depart</label>
+                              <Input 
+                                type="date" 
+                                value={startDate ? format(startDate, "yyyy-MM-dd") : ""} 
+                                required 
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium">Return</label>
+                              <Input 
+                                type="date" 
+                                value={endDate ? format(endDate, "yyyy-MM-dd") : ""} 
+                                required 
+                              />
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium">Passengers</label>
+                              <Input type="number" min="1" defaultValue="1" required />
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium">Class</label>
+                              <select className="w-full p-2 border rounded-md">
+                                <option>Economy</option>
+                                <option>Premium Economy</option>
+                                <option>Business</option>
+                                <option>First</option>
+                              </select>
+                            </div>
+                          </div>
+                          <div className="pt-4">
+                            <Button type="submit" className="w-full">
+                              <CreditCard className="h-4 w-4 mr-2" />
+                              Book Now
+                            </Button>
+                          </div>
+                        </form>
+                      </DialogContent>
+                    </Dialog>
+
+                    {/* Hotel Booking */}
+                    <Dialog open={hotelBookingDialogOpen} onOpenChange={setHotelBookingDialogOpen}>
+                      <DialogTrigger asChild>
+                        <Button className="w-full" variant="outline">
+                          <Hotel className="h-4 w-4 mr-2" />
+                          Book Hotel
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-md">
+                        <DialogHeader>
+                          <DialogTitle>Book Your Hotel</DialogTitle>
+                          <DialogDescription>
+                            Find and book accommodations in {selectedCity}
+                          </DialogDescription>
+                        </DialogHeader>
+                        <form onSubmit={handleBookHotel} className="space-y-4 mt-4">
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">Destination</label>
+                            <Input value={selectedCity} readOnly />
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium">Check-in</label>
+                              <Input 
+                                type="date" 
+                                value={startDate ? format(startDate, "yyyy-MM-dd") : ""} 
+                                required 
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium">Check-out</label>
+                              <Input 
+                                type="date" 
+                                value={endDate ? format(endDate, "yyyy-MM-dd") : ""} 
+                                required 
+                              />
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium">Rooms</label>
+                              <Input type="number" min="1" defaultValue="1" required />
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium">Guests</label>
+                              <Input type="number" min="1" defaultValue="2" required />
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">Hotel Class</label>
+                            <select className="w-full p-2 border rounded-md">
+                              <option>Any</option>
+                              <option>3+ Stars</option>
+                              <option>4+ Stars</option>
+                              <option>5 Stars</option>
+                            </select>
+                          </div>
+                          <div className="pt-4">
+                            <Button type="submit" className="w-full">
+                              <CreditCard className="h-4 w-4 mr-2" />
+                              Book Now
+                            </Button>
+                          </div>
+                        </form>
+                      </DialogContent>
+                    </Dialog>
+                  </CardFooter>
                 </Card>
               )}
             </div>

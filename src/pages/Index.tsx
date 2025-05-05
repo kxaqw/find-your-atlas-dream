@@ -1,14 +1,20 @@
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import Hero from '@/components/Hero';
 import DestinationCard from '@/components/DestinationCard';
 import Globe from '@/components/Globe';
 import { destinations } from '@/data/destinations';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Map, Compass, Calendar, Users, Building, Plane } from 'lucide-react';
 
 const Index = () => {
+  const navigate = useNavigate();
+
+  const handleDestinationClick = (destinationName: string) => {
+    navigate('/plan', { state: { selectedCity: destinationName } });
+  };
+
   return (
     <Layout>
       {/* Hero Section with Kinetic Typography and Search */}
@@ -17,30 +23,18 @@ const Index = () => {
       {/* Popular Destinations Section */}
       <section className="py-16 px-6 bg-white">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12">
-            <div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">Popular Destinations</h2>
-              <p className="text-lg text-muted-foreground max-w-2xl">
-                Discover breathtaking locations loved by travelers around the world
-              </p>
-            </div>
-            
-            <div className="mt-6 md:mt-0">
-              <Tabs defaultValue="all">
-                <TabsList>
-                  <TabsTrigger value="all">All</TabsTrigger>
-                  <TabsTrigger value="beaches">Beaches</TabsTrigger>
-                  <TabsTrigger value="mountains">Mountains</TabsTrigger>
-                  <TabsTrigger value="cities">Cities</TabsTrigger>
-                  <TabsTrigger value="cultural">Cultural</TabsTrigger>
-                </TabsList>
-              </Tabs>
-            </div>
+          <div className="mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Popular Destinations</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl">
+              Discover breathtaking locations loved by travelers around the world
+            </p>
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {destinations.map((destination) => (
-              <DestinationCard key={destination.id} destination={destination} />
+              <div key={destination.id} onClick={() => handleDestinationClick(destination.name)} className="cursor-pointer">
+                <DestinationCard destination={destination} />
+              </div>
             ))}
           </div>
         </div>
@@ -104,9 +98,9 @@ const Index = () => {
               Plan Your Trip
             </a>
             
-            <a href="/discover" className="bg-transparent border-2 border-white hover:bg-white/10 px-8 py-4 rounded-full font-semibold flex items-center transition-all hover:-translate-y-1">
+            <a href="/trips" className="bg-transparent border-2 border-white hover:bg-white/10 px-8 py-4 rounded-full font-semibold flex items-center transition-all hover:-translate-y-1">
               <Users className="h-5 w-5 mr-2" />
-              Join Our Community
+              View My Trips
             </a>
           </div>
         </div>

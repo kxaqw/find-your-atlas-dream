@@ -1,18 +1,23 @@
 
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, MapPin, Plane } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { searchDestinations } from '@/data/destinations';
+import { toast } from 'sonner';
 
 const SearchBar: React.FC = () => {
+  const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [isActive, setIsActive] = useState(false);
   const [results, setResults] = useState<any[]>([]);
+  const [selectedDestination, setSelectedDestination] = useState<string | null>(null);
   const searchRef = useRef<HTMLDivElement>(null);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setQuery(value);
+    setSelectedDestination(null);
     
     if (value.length >= 2) {
       setResults(searchDestinations(value));
@@ -44,6 +49,33 @@ const SearchBar: React.FC = () => {
       ));
   };
 
+  const handleSelectDestination = (destination: any) => {
+    setQuery(destination.name);
+    setSelectedDestination(destination.name);
+    setIsActive(false);
+  };
+
+  const handleExploreClick = () => {
+    if (query) {
+      const matchedDestination = results.find(
+        dest => dest.name.toLowerCase() === query.toLowerCase()
+      );
+      
+      if (matchedDestination) {
+        navigate('/plan', { state: { selectedCity: matchedDestination.name } });
+      } else {
+        // If no exact match but we have results, use the first one
+        if (results.length > 0) {
+          navigate('/plan', { state: { selectedCity: results[0].name } });
+        } else {
+          toast.error('Please select a valid destination');
+        }
+      }
+    } else {
+      toast.error('Please enter a destination');
+    }
+  };
+
   return (
     <div ref={searchRef} className="relative">
       <div
@@ -71,6 +103,7 @@ const SearchBar: React.FC = () => {
               variant="default"
               size="lg"
               className="rounded-full px-6 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 transition-all duration-300"
+              onClick={handleExploreClick}
             >
               <span className="hidden sm:inline mr-2">Explore</span>
               <Plane className="h-5 w-5" />
@@ -79,30 +112,15 @@ const SearchBar: React.FC = () => {
         </div>
       </div>
 
-      {/* Surprise Me button */}
-      <div className="absolute right-0 top-full mt-4">
-        <Button 
-          variant="outline" 
-          className="rounded-full shadow-md bg-white hover:bg-gray-50 border-transparent text-sm group overflow-hidden"
-        >
-          <span className="mr-2">Surprise Me!</span>
-          <span className="relative inline-block h-5 w-5 rounded-full overflow-hidden bg-gradient-to-r from-blue-400 to-indigo-500 group-hover:animate-pulse">
-            <span className="absolute inset-0 animate-rotate-globe">
-              <span className="absolute inset-0 rounded-full border-t border-blue-200"></span>
-            </span>
-          </span>
-        </Button>
-      </div>
-
       {/* Search results dropdown */}
       {isActive && results.length > 0 && (
         <div className="absolute z-10 mt-2 w-full rounded-lg shadow-lg bg-white overflow-hidden animate-scale-up">
           <ul className="max-h-96 overflow-auto">
             {results.map((result) => (
               <li key={result.id} className="border-b border-gray-100 last:border-b-0">
-                <a
-                  href="#"
-                  className="block p-4 hover:bg-gray-50 transition duration-200 ease-in-out"
+                <button
+                  onClick={() => handleSelectDestination(result)}
+                  className="block w-full text-left p-4 hover:bg-gray-50 transition duration-200 ease-in-out"
                 >
                   <div className="flex items-start">
                     <div
@@ -127,7 +145,7 @@ const SearchBar: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                </a>
+                </button>
               </li>
             ))}
           </ul>

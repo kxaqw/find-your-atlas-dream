@@ -1,162 +1,81 @@
 
-import React, { useState } from 'react';
-import { Heart, Star, ArrowRight, Thermometer } from 'lucide-react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { MapPin, Star, Calendar } from 'lucide-react';
 import { Destination } from '@/data/destinations';
-import { cn } from '@/lib/utils';
 
 interface DestinationCardProps {
   destination: Destination;
 }
 
 const DestinationCard: React.FC<DestinationCardProps> = ({ destination }) => {
-  const [isLiked, setIsLiked] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
-  const [activeSlide, setActiveSlide] = useState(0);
+  const navigate = useNavigate();
 
-  // Mock multiple images from single image for demo purposes
-  const mockImages = [
-    destination.image,
-    destination.image.replace('auto=format', 'auto=format&q=85'),
-    destination.image.replace('auto=format', 'auto=format&q=70')
-  ];
-
-  const toggleLike = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsLiked(!isLiked);
-  };
-
-  const renderSeasonalityGraph = () => {
-    const months = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
-    const maxValue = Math.max(...destination.seasonalityData);
-    
-    return (
-      <div className="px-4 py-3">
-        <h4 className="text-sm font-medium mb-2">Best Time to Visit</h4>
-        <div className="flex items-end h-20 gap-1">
-          {destination.seasonalityData.map((value, index) => (
-            <div key={index} className="flex flex-col items-center flex-1">
-              <div 
-                className={cn(
-                  "w-full rounded-t transition-all duration-300",
-                  value === 5 ? "bg-green-500" : 
-                  value === 4 ? "bg-green-400" : 
-                  value === 3 ? "bg-yellow-400" : 
-                  value === 2 ? "bg-orange-400" : "bg-red-400"
-                )}
-                style={{ height: `${(value / maxValue) * 100}%` }}
-              ></div>
-              <span className="text-xs mt-1 text-gray-500">{months[index]}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
+  const handleClick = () => {
+    navigate('/plan', { state: { selectedCity: destination.name } });
   };
 
   return (
-    <div
-      className={cn(
-        "group relative overflow-hidden rounded-xl bg-white shadow-md card-hover",
-        isHovered && "z-10"
-      )}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+    <div 
+      className="group relative overflow-hidden rounded-xl shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer"
+      onClick={handleClick}
     >
-      <a href="#" className="block">
-        <div className="relative h-48 overflow-hidden">
-          {/* Image Slider */}
-          <div className="absolute inset-0 transition-transform duration-500" style={{ transform: `translateX(-${activeSlide * 100}%)` }}>
-            <div className="flex">
-              {mockImages.map((img, idx) => (
-                <div key={idx} className="relative min-w-full h-48">
-                  <img
-                    src={img}
-                    alt={destination.name}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                </div>
-              ))}
+      {/* Image */}
+      <div className="h-52 overflow-hidden">
+        <img
+          src={destination.image}
+          alt={destination.name}
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+        />
+      </div>
+      
+      {/* Content */}
+      <div className="p-4 bg-white">
+        <div className="flex items-start justify-between">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900">{destination.name}</h3>
+            <div className="flex items-center text-sm text-gray-500 mt-1">
+              <MapPin className="h-3.5 w-3.5 mr-1" />
+              <span>{destination.country}</span>
             </div>
           </div>
-
-          {/* Slider Controls (only show on hover) */}
-          {isHovered && mockImages.length > 1 && (
-            <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1 z-10">
-              {mockImages.map((_, idx) => (
-                <button
-                  key={idx}
-                  className={`w-1.5 h-1.5 rounded-full ${activeSlide === idx ? 'bg-white' : 'bg-white/50'}`}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setActiveSlide(idx);
-                  }}
-                />
-              ))}
-            </div>
-          )}
-
-          {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-          
-          {/* Heart Button */}
-          <button
-            onClick={toggleLike}
-            className="absolute top-3 right-3 p-2 rounded-full bg-white/30 backdrop-blur-sm z-10 transition-all hover:bg-white/50"
-          >
-            <Heart
-              className={cn(
-                "h-5 w-5 transition-colors",
-                isLiked ? "heart-icon active text-red-500 fill-red-500" : "text-white"
-              )}
-            />
-          </button>
-          
-          {/* Location and Price */}
-          <div className="absolute bottom-3 left-3 text-white">
-            <h3 className="text-lg font-bold">{destination.name}</h3>
-            <p className="text-sm text-white/90">{destination.country}</p>
-          </div>
-          
-          <div className="absolute bottom-3 right-3 flex items-center space-x-1 text-white">
-            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-            <span>{destination.rating}</span>
+          <div className="flex items-center bg-primary/10 text-primary px-2 py-1 rounded">
+            <Star className="h-3.5 w-3.5 mr-1 fill-primary text-primary" />
+            <span className="text-xs font-medium">{destination.rating}</span>
           </div>
         </div>
-
-        <div className="p-4">
-          <div className="flex justify-between items-center mb-2">
-            <div className="flex items-center">
-              <Thermometer className="h-4 w-4 text-sunset mr-1" />
-              <span className="text-sm">{destination.temperature}°C in {destination.month}</span>
-            </div>
-            <div className="text-sm">
-              <span className="text-forest-dark">
-                {Array(destination.price).fill('$').join('')}
-              </span>
-              <span className="text-gray-300">
-                {Array(5 - destination.price).fill('$').join('')}
-              </span>
-            </div>
+        
+        <p className="text-sm text-gray-600 mt-3 line-clamp-2">{destination.description}</p>
+        
+        <div className="mt-4 pt-3 border-t border-gray-100 flex justify-between items-center">
+          <div className="flex items-center text-sm">
+            <Calendar className="h-3.5 w-3.5 mr-1 text-gray-400" />
+            <span className="text-gray-600">Best: {destination.month}</span>
           </div>
-          
-          <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-            {destination.description}
-          </p>
-          
-          {/* Expandable Content - only shown when hovered */}
-          <div className={`overflow-hidden transition-all duration-300 ${isHovered ? 'max-h-72 opacity-100' : 'max-h-0 opacity-0'}`}>
-            {/* Seasonality Graph */}
-            {renderSeasonalityGraph()}
-            
-            <div className="p-4 pt-0">
-              <button className="w-full py-2 px-4 bg-primary text-white rounded-lg flex items-center justify-center transition-all hover:bg-primary/90">
-                <span>Explore</span>
-                <ArrowRight className="h-4 w-4 ml-2" />
-              </button>
-            </div>
+          <div className="text-sm font-semibold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
+            {Array(destination.price).fill('$').join('')}
           </div>
         </div>
-      </a>
+      </div>
+      
+      {/* Seasonality indicator (hidden until hover) */}
+      <div className="absolute top-0 left-0 right-0 h-1 flex opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+        {destination.seasonalityData.map((value, index) => (
+          <div
+            key={index}
+            className="flex-1"
+            style={{
+              backgroundColor: 
+                value === 5 ? '#34D399' : // green
+                value === 4 ? '#6EE7B7' : // light green
+                value === 3 ? '#FCD34D' : // yellow
+                value === 2 ? '#F59E0B' : // orange
+                              '#EF4444', // red
+              height: '4px'
+            }}
+          />
+        ))}
+      </div>
     </div>
   );
 };
