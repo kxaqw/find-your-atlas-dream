@@ -21,7 +21,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from '@/components/ui/input';
-import { Calendar, Plus, MapPin, Users, User } from 'lucide-react';
+import { Calendar, Plus, MapPin, Users, User, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 // Mock trip data (in a real app this would come from a database)
@@ -43,6 +43,24 @@ const mockTrips = [
     endDate: "2025-07-18",
     image: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?q=80&w=2070&auto=format&fit=crop",
     attractions: 3
+  },
+  {
+    id: "3",
+    name: "Tokyo Exploration",
+    destination: "Tokyo, Japan",
+    startDate: "2025-09-05",
+    endDate: "2025-09-15",
+    image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=1988&auto=format&fit=crop",
+    attractions: 7
+  },
+  {
+    id: "4",
+    name: "Rome Getaway",
+    destination: "Rome, Italy",
+    startDate: "2025-05-20",
+    endDate: "2025-05-27",
+    image: "https://images.unsplash.com/photo-1515542622106-78bda8ba0e5b?q=80&w=2070&auto=format&fit=crop",
+    attractions: 6
   }
 ];
 
@@ -71,6 +89,11 @@ const Trips: React.FC = () => {
     } else {
       toast.error("Please enter a username");
     }
+  };
+  
+  const handleRemoveTrip = (tripId: string) => {
+    setTrips(prevTrips => prevTrips.filter(trip => trip.id !== tripId));
+    toast.success("Trip removed successfully!");
   };
   
   return (
@@ -127,12 +150,22 @@ const Trips: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {trips.map(trip => (
               <Card key={trip.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                <div className="h-48 overflow-hidden">
+                <div className="h-48 overflow-hidden relative">
                   <img 
                     src={trip.image} 
                     alt={trip.destination}
                     className="w-full h-full object-cover transition-transform hover:scale-105"
                   />
+                  <div className="absolute top-2 right-2">
+                    <Button 
+                      variant="destructive" 
+                      size="sm"
+                      onClick={() => handleRemoveTrip(trip.id)}
+                      className="h-8 w-8 p-0"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
                 <CardHeader className="pb-2">
                   <CardTitle>{trip.name}</CardTitle>

@@ -5,6 +5,7 @@ import Layout from '@/components/Layout';
 import Hero from '@/components/Hero';
 import DestinationCard from '@/components/DestinationCard';
 import Globe from '@/components/Globe';
+import ContinentSelector from '@/components/ContinentSelector';
 import { destinations } from '@/data/destinations';
 import { Map, Compass, Calendar, Users, Building, Plane } from 'lucide-react';
 
@@ -13,6 +14,19 @@ const Index = () => {
 
   const handleDestinationClick = (destinationName: string) => {
     navigate('/plan', { state: { selectedCity: destinationName } });
+  };
+  
+  const handleCountrySelect = (country: string) => {
+    const destinationInCountry = destinations.find(
+      dest => dest.country.includes(country)
+    );
+    
+    if (destinationInCountry) {
+      navigate('/plan', { state: { selectedCity: destinationInCountry.name } });
+    } else {
+      // If no exact destination found, just navigate to plan page
+      navigate('/plan', { state: { selectedCountry: country } });
+    }
   };
 
   return (
@@ -37,6 +51,9 @@ const Index = () => {
               </div>
             ))}
           </div>
+          
+          {/* Continent Selector */}
+          <ContinentSelector onSelectCountry={handleCountrySelect} />
         </div>
       </section>
       
