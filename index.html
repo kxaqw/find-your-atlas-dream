@@ -1,26 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>find-your-atlas-dream</title>
-    <meta name="description" content="Lovable Generated Project" />
-    <meta name="author" content="Lovable" />
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atlas Travel Planner | University Project</title>
+  <meta name="description" content="A travel planning web application developed for our Computer Science course project" />
+  <meta name="author" content="Team Atlas, CAU, 2025" />
+  <meta name="keywords" content="travel, planner, itinerary, university project" />
 
-    <meta property="og:title" content="find-your-atlas-dream" />
-    <meta property="og:description" content="Lovable Generated Project" />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+  <!-- Open Graph / Social Media Meta Tags -->
+  <meta property="og:title" content="Atlas Travel Planner" />
+  <meta property="og:description" content="Student project from the Department of Computer Science" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="/assets/social-preview.jpg" />
 
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@lovable_dev" />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
-  </head>
+  <!-- Favicon -->
+  <link rel="icon" href="/assets/favicon.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 
-  <body>
-    <div id="root"></div>
-    <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
-    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Loading Styles -->
+  <style>
+    #root:empty::before {
+      content: "Loading application...";
+      display: block;
+      text-align: center;
+      padding: 2rem;
+      font-family: 'Roboto', sans-serif;
+      color: #333;
+    }
+  </style>
+</head>
+
+<body>
+  <noscript>
+    <div style="text-align: center; padding: 2rem; font-family: 'Roboto', sans-serif;">
+      <h2>JavaScript is required to run this application</h2>
+      <p>This is a student project developed for Modern Web Technologies course at University of London</p>
+    </div>
+  </noscript>
+
+  <div id="root"></div>
+
+  <!-- Main application script -->
+  <script type="module" src="/src/main.tsx"></script>
+
+  <!-- Student project tracking - for educational purposes only -->
+  <script>
+    console.log('Atlas Travel Planner initialized');
+    console.log('Project developed by Team Atlas - CS401 Course Project');
+  </script>
+</body>
 </html>
