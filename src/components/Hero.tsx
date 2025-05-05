@@ -1,5 +1,7 @@
 
 import React, { useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 import SearchBar from './SearchBar';
 
 const Hero: React.FC = () => {
@@ -51,6 +53,14 @@ const Hero: React.FC = () => {
         
         <div className="max-w-xl mx-auto animate-fade-in" style={{ animationDelay: '1.5s' }}>
           <SearchBar />
+          
+          <div className="mt-8">
+            <Link to="/plan">
+              <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-8 py-6 rounded-full text-lg">
+                Plan Your Trip
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
     </div>

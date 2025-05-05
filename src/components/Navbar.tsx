@@ -2,7 +2,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Compass, User, Search, Menu, X } from 'lucide-react';
+import { Compass, Search, Menu, X } from 'lucide-react';
+import { SignInModal, SignUpModal } from './auth/AuthModals';
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
@@ -38,10 +39,8 @@ const Navbar: React.FC = () => {
             <Search className="h-4 w-4" />
             <span>Search</span>
           </Button>
-          <Button variant="default" size="sm" className="flex items-center gap-2 bg-primary hover:bg-primary/90">
-            <User className="h-4 w-4" />
-            <span>Sign In</span>
-          </Button>
+          <SignInModal />
+          <SignUpModal />
         </div>
 
         {/* Mobile Menu Button */}
@@ -90,10 +89,10 @@ const Navbar: React.FC = () => {
                 <Search className="h-4 w-4 mr-2" />
                 <span>Search</span>
               </Button>
-              <Button variant="default" className="w-full justify-start bg-primary hover:bg-primary/90">
-                <User className="h-4 w-4 mr-2" />
-                <span>Sign In</span>
-              </Button>
+              <div className="flex flex-col space-y-3">
+                <SignInModal />
+                <SignUpModal />
+              </div>
             </div>
           </div>
         </div>
